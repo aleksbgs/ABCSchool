@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace Infrastructure.Constants;
 
 public static class SchoolAction
@@ -44,25 +46,37 @@ public static class SchoolPermissions
         new SchoolPermission(SchoolAction.Update, SchoolFeature.Users, "Update Users"),
         new SchoolPermission(SchoolAction.Delete, SchoolFeature.Users, "Delete Users"),
         new SchoolPermission(SchoolAction.Read, SchoolFeature.Users, "Read Users"),
-        
+
         new SchoolPermission(SchoolAction.Read, SchoolFeature.UserRoles, "Read User Roles"),
         new SchoolPermission(SchoolAction.Update, SchoolFeature.UserRoles, "Update User Roles"),
-       
+
         new SchoolPermission(SchoolAction.Read, SchoolFeature.Roles, "Read Roles"),
         new SchoolPermission(SchoolAction.Create, SchoolFeature.Roles, "Create Roles"),
         new SchoolPermission(SchoolAction.Update, SchoolFeature.Roles, "Update Roles"),
         new SchoolPermission(SchoolAction.Delete, SchoolFeature.Roles, "Delete Roles"),
-        
+
         new SchoolPermission(SchoolAction.Read, SchoolFeature.RoleClaims, "Read Role Claims/Permissions"),
         new SchoolPermission(SchoolAction.Update, SchoolFeature.RoleClaims, "Update Role Claims/Permissions"),
-        
-        new SchoolPermission(SchoolAction.Read, SchoolFeature.School, "Read School"),
+
+        new SchoolPermission(SchoolAction.Read, SchoolFeature.School, "Read School", IsBasic: true),
         new SchoolPermission(SchoolAction.Create, SchoolFeature.School, "Create School"),
         new SchoolPermission(SchoolAction.Update, SchoolFeature.School, "Update School"),
         new SchoolPermission(SchoolAction.Delete, SchoolFeature.School, "Delete School"),
- 
-        
     ];
+
+    public static IReadOnlyList<SchoolPermission> All { get; } =
+        new ReadOnlyCollection<SchoolPermission>(_allPermissions);
+
+    public static IReadOnlyList<SchoolPermission> Root { get; } =
+        new ReadOnlyCollection<SchoolPermission>(_allPermissions.Where(p => p.IsRoot).ToArray());
+
+
+    public static IReadOnlyList<SchoolPermission> Admin { get; } =
+        new ReadOnlyCollection<SchoolPermission>(_allPermissions.Where(p => !p.IsRoot).ToArray());
+
+    public static IReadOnlyList<SchoolPermission> Basic { get; } =
+        new ReadOnlyCollection<SchoolPermission>(_allPermissions.Where(p => p.IsBasic).ToArray());
+
 }
 
  
