@@ -9,23 +9,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Context;
 
-public abstract class BaseDbContext : MultiTenantIdentityDbContext<
-    ApplicationUser,
-    ApplicationRole, string,
-    IdentityUserClaim<string>,
-    IdentityUserRole<string>,
-    IdentityUserLogin<string>,
-    IdentityRoleClaim<string>,
-    IdentityUserToken<string>>
+public abstract class BaseDbContext :
+    MultiTenantIdentityDbContext<
+        ApplicationUser,
+        ApplicationRole,
+        string,
+        IdentityUserClaim<string>,
+        IdentityUserRole<string>,
+        IdentityUserLogin<string>,
+        ApplicationRoleClaim,
+        IdentityUserToken<string>>
 {
     private new AbcSchoolTenantInfo TenantInfo { get; set; }
 
-    protected BaseDbContext(IMultiTenantContextAccessor<AbcSchoolTenantInfo> tenantInfoContextAccessor,
-        DbContextOptions options)
+    protected BaseDbContext(IMultiTenantContextAccessor<AbcSchoolTenantInfo> tenantInfoContextAccessor, DbContextOptions options) 
         : base(tenantInfoContextAccessor, options)
     {
         TenantInfo = tenantInfoContextAccessor.MultiTenantContext.TenantInfo;
     }
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -33,8 +35,19 @@ public abstract class BaseDbContext : MultiTenantIdentityDbContext<
 
         if (!string.IsNullOrEmpty(TenantInfo?.ConnectionString))
         {
-            optionsBuilder.UseSqlServer(TenantInfo.ConnectionString,
-                options => { options.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName); });
+            optionsBuilder.UseSqlServer(TenantInfo?.ConnectionString, options =>
+            {
+                options.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
+            }); 
         }
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+    }
+    
+    
 }
